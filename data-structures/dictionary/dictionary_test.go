@@ -13,91 +13,64 @@ func TestSetAndGetDictionary(t *testing.T) {
 		setValues    *valuePair
 		wantErrorSet error
 		wantErrorGet error
-		wantResult   interface{}
+		wantResult   []I
 	}{
 		{
-			name: "insert invalid with empty key",
+			name: "insert invalid: with empty key",
 			setValues: &valuePair{
 				Key:   "",
-				Value: "tyrion@email.com",
+				Value: []I{"tyrion@email.com"},
 			},
-			wantErrorSet: errors.New("fail to insert the element"),
-			wantErrorGet: errors.New("fail to get the element"),
-			wantResult:   "",
+			wantErrorSet: errors.New("fail to insert the element in the dictionary"),
+			wantErrorGet: errors.New("fail to get the element from dictionary"),
+			wantResult:   nil,
 		},
 		{
-			name: "insert invalid with empty value",
-			setValues: &valuePair{
-				Key:   "John",
-				Value: "",
-			},
-			wantErrorSet: errors.New("fail to insert the element"),
-			wantErrorGet: errors.New("fail to get the element"),
-			wantResult:   "",
-		},
-		{
-			name: "insert invalid with empty key and value",
-			setValues: &valuePair{
-				Key:   "",
-				Value: "",
-			},
-			wantErrorSet: errors.New("fail to insert the element"),
-			wantErrorGet: errors.New("fail to get the element"),
-			wantResult:   "",
-		},
-		{
-			name: "insert invalid: key and value with white spaces",
+			name: "insert invalid: key as white spaces",
 			setValues: &valuePair{
 				Key:   "          ",
-				Value: "          ",
+				Value: []I{},
 			},
-			wantErrorSet: errors.New("fail to insert the element"),
-			wantErrorGet: errors.New("fail to get the element"),
-			wantResult:   "",
-		},
-		{
-			name: "insert invalid: key as white space and value as number",
-			setValues: &valuePair{
-				Key:   "   ",
-				Value: 1939,
-			},
-			wantErrorSet: errors.New("fail to insert the element"),
-			wantErrorGet: errors.New("fail to get the element"),
-			wantResult:   "",
-		},
-		{
-			name: "insert invalid: key as number and value as white space",
-			setValues: &valuePair{
-				Key:   1939,
-				Value: "   ",
-			},
-			wantErrorSet: errors.New("fail to insert the element"),
-			wantErrorGet: errors.New("fail to get the element"),
-			wantResult:   "",
+			wantErrorSet: errors.New("fail to insert the element in the dictionary"),
+			wantErrorGet: errors.New("fail to get the element from dictionary"),
+			wantResult:   nil,
 		},
 		{
 			name: "insert and get with success: key and value as string",
 			setValues: &valuePair{
 				Key:   "Gandalf",
-				Value: "gandalf@email.com",
+				Value: []I{"gandalf@email.com"},
 			},
-			wantResult: "gandalf@email.com",
+			wantResult: []I{"gandalf@email.com"},
 		},
+
 		{
 			name: "insert and get with success: key as number and value as string",
 			setValues: &valuePair{
 				Key:   1914,
-				Value: "World War I",
+				Value: []I{"World War I"},
 			},
-			wantResult: "World War I",
+			wantResult: []I{"World War I"},
 		},
 		{
-			name: "insert with success: key as string and value as number",
+			name: "insert and get with success: key as string and value as number",
 			setValues: &valuePair{
 				Key:   "World War II",
-				Value: 1939,
+				Value: []I{1939},
 			},
-			wantResult: 1939,
+			wantResult: []I{1939},
+		},
+		{
+			name: "insert and get with success: key as string and value as slice",
+			setValues: &valuePair{
+				Key: "books",
+				Value: []I{
+					[]string{"The lord of the rings", "The hobbit", "The silmarillion"},
+				},
+			},
+			wantResult: []I{
+				[]string{"The lord of the rings", "The hobbit", "The silmarillion"},
+			},
 		},
 	}
 

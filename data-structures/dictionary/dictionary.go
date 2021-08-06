@@ -7,37 +7,72 @@ import (
 )
 
 type Dictionary interface {
-	Set(key, value interface{}) error
-	Get(key interface{}) (interface{}, error)
+	Set(key I, value []I) error
+	Get(key I) ([]I, error)
+	HasKey(key I) bool
 }
 
 type dictionary struct {
-	table   map[string]*valuePair
-	toStrFn func(key interface{}) string
+	Table   map[string]*valuePair
+	ToStrFn func(key interface{}) string
 }
 
 func NewDictionary() Dictionary {
 	return &dictionary{
-		table:   map[string]*valuePair{},
-		toStrFn: utils.DefaultToString,
+		Table:   map[string]*valuePair{},
+		ToStrFn: utils.DefaultToString,
 	}
 }
 
-func (d *dictionary) Set(key, value interface{}) error {
-	if !utils.IsEmpty(key) && !utils.IsEmpty(value) {
-		tableKey := d.toStrFn(key)
-		d.table[tableKey] = &valuePair{
+func (d *dictionary) Set(key I, value []I) error {
+	if !utils.IsEmpty(key) {
+		tableKey := d.ToStrFn(key)
+		d.Table[tableKey] = &valuePair{
 			Key:   key,
 			Value: value,
 		}
+
 		return nil
 	}
-	return errors.New("fail to insert the element")
+
+	return errors.New("fail to insert the element in the dictionary")
 }
 
-func (d dictionary) Get(key interface{}) (interface{}, error) {
-	if valuePair, ok := d.table[d.toStrFn(key)]; ok {
+func (d dictionary) Get(key I) ([]I, error) {
+	if valuePair, ok := d.Table[d.ToStrFn(key)]; ok {
 		return valuePair.Value, nil
 	}
-	return "", errors.New("fail to get the element")
+
+	return nil, errors.New("fail to get the element from dictionary")
+}
+
+func (d *dictionary) Remove(key I) error {
+	if d.HasKey(key) {
+		keyString := d.ToStrFn(key)
+		delete(d.Table, keyString)
+
+		return nil
+	}
+
+	return errors.New("fail to remove the element from dictionary")
+}
+
+func (d dictionary) HasKey(key I) bool {
+	if _, ok := d.Table[d.ToStrFn(key)]; ok {
+		return true
+	}
+
+	return false
+}
+
+func (d dictionary) Size() int {
+	return len(d.Table)
+}
+
+func (d dictionary) IsEmpty() bool {
+	return d.Size() == 0
+}
+
+func (d *dictionary) Clear() {
+	d.Table = map[string]*valuePair{}
 }
