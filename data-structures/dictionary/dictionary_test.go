@@ -16,7 +16,7 @@ func TestSetAndGetDictionary(t *testing.T) {
 		wantResult   []I
 	}{
 		{
-			name: "insert invalid: with empty key",
+			name: "insert invalid: empty key",
 			setValues: &valuePair{
 				Key:   "",
 				Value: []I{"tyrion@email.com"},
@@ -43,7 +43,6 @@ func TestSetAndGetDictionary(t *testing.T) {
 			},
 			wantResult: []I{"gandalf@email.com"},
 		},
-
 		{
 			name: "insert and get with success: key as number and value as string",
 			setValues: &valuePair{

@@ -2,8 +2,10 @@ package graph
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/Gabriel-Pessoa/studying-graph/data-structures/dictionary"
+	"github.com/Gabriel-Pessoa/studying-graph/utils"
 )
 
 type i interface{}
@@ -11,6 +13,9 @@ type i interface{}
 type Graph interface {
 	AddVertex(v i) error
 	AddEdge(v, w i) error
+	GetVertices() []i
+	GetAdjList(v i) ([]dictionary.I, error)
+	ToString() string
 }
 
 type graph struct {
@@ -28,7 +33,7 @@ func NewGraph(isDirected bool) Graph {
 }
 
 func (g *graph) AddVertex(v i) error {
-	if !g.includes(v) {
+	if !g.includes(v) && !utils.IsEmpty(v) {
 		g.Vertices = append(g.Vertices, v)
 		g.AdjList.Set(v, []dictionary.I{})
 
@@ -52,9 +57,8 @@ func (g *graph) AddEdge(v, w i) error {
 		return err
 	}
 
-	newAdjListV := adjListV
-	newAdjListV = append(newAdjListV, w)
-	g.AdjList.Set(v, newAdjListV)
+	adjListV = append(adjListV, w)
+	g.AdjList.Set(v, adjListV)
 
 	if !g.IsDirected {
 		adjListW, err := g.AdjList.Get(w)
@@ -62,12 +66,40 @@ func (g *graph) AddEdge(v, w i) error {
 			return err
 		}
 
-		newAdjListW := adjListW
-		newAdjListW = append(newAdjListW, v)
-		g.AdjList.Set(w, newAdjListW)
+		adjListW = append(adjListW, v)
+		g.AdjList.Set(w, adjListW)
 	}
 
 	return nil
+}
+
+func (g graph) GetVertices() []i {
+	return g.Vertices
+}
+
+func (g graph) GetAdjList(v i) ([]dictionary.I, error) {
+	return g.AdjList.Get(v)
+}
+
+func (g graph) ToString() string {
+	var s string
+
+	for i := 0; i < len(g.Vertices); i++ {
+		s += fmt.Sprintf("%v -> ", g.Vertices[i])
+
+		neighbors, err := g.AdjList.Get(g.Vertices[i])
+		if err != nil {
+			panic("fail to get adjacencies")
+		}
+
+		for j := 0; j < len(neighbors); j++ {
+			s += fmt.Sprintf("%v ", neighbors[j])
+		}
+
+		s += "\n"
+	}
+
+	return s
 }
 
 func (g graph) includes(searchElement i) bool {
@@ -76,6 +108,5 @@ func (g graph) includes(searchElement i) bool {
 			return true
 		}
 	}
-
 	return false
 }

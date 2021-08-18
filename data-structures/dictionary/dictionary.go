@@ -10,6 +10,7 @@ type Dictionary interface {
 	Set(key I, value []I) error
 	Get(key I) ([]I, error)
 	HasKey(key I) bool
+	Remove(key I) error
 }
 
 type dictionary struct {
