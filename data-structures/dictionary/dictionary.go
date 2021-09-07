@@ -6,11 +6,16 @@ import (
 	"github.com/Gabriel-Pessoa/studying-graph/utils"
 )
 
+type I interface{}
+
 type Dictionary interface {
 	Set(key I, value []I) error
 	Get(key I) ([]I, error)
 	HasKey(key I) bool
 	Remove(key I) error
+	Size() int
+	IsEmpty() bool
+	Clear()
 }
 
 type dictionary struct {
@@ -55,7 +60,7 @@ func (d *dictionary) Remove(key I) error {
 		return nil
 	}
 
-	return errors.New("fail to remove the element from dictionary")
+	return errors.New("fail to remove the element of the dictionary")
 }
 
 func (d dictionary) HasKey(key I) bool {
