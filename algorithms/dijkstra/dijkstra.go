@@ -21,7 +21,6 @@ func Dijkstra(adjMatrix [][]int, src int) (route []string, dist []int) {
 
 	for i := 0; i < length; i++ {
 		dist[i] = INF
-		visited[i] = false
 	}
 
 	dist[src] = 0

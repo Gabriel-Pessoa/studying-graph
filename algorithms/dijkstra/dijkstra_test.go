@@ -18,11 +18,9 @@ func TestDijkstra(t *testing.T) {
 		{0, 0, 0, 2, 2, 0},
 	}
 
-	t.Run("Dijkstra success test", func(t *testing.T) {
-		route, dist := Dijkstra(adjMatrix, 0)
+	route, dist := Dijkstra(adjMatrix, 0)
 
-		assert.Equal(t, len(route), len(dist))
-		assert.Equal(t, expectedRoute, route)
-		assert.Equal(t, expectedDist, dist)
-	})
+	assert.Equal(t, len(route), len(dist))
+	assert.Equal(t, expectedRoute, route)
+	assert.Equal(t, expectedDist, dist)
 }

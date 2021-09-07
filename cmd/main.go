@@ -4,18 +4,11 @@ import (
 	"fmt"
 
 	"github.com/Gabriel-Pessoa/studying-graph/algorithms/dijkstra"
-	"github.com/Gabriel-Pessoa/studying-graph/data-structures/dictionary"
 	"github.com/Gabriel-Pessoa/studying-graph/data-structures/graph"
-	"github.com/Gabriel-Pessoa/studying-graph/data-structures/stack"
 )
 
 func main() {
-	// *********** Dictionary data structure  ****************
-	dict := dictionary.NewDictionary()
-	dict.Set("A", []dictionary.I{"A", "B", "C"})
-	fmt.Println(dict.Get("A"))
-	dict.Remove("A")
-	fmt.Println(dict.Get("A"))
+	fmt.Printf("Start\n\n")
 
 	// *********** Graph data structure  ****************
 	graph := graph.NewGraph(false)
@@ -37,19 +30,6 @@ func main() {
 
 	fmt.Println(graph.ToString())
 
-	// *********** Stack data structure  ****************
-	stack := stack.NewStack()
-	stack.Push(5)
-	stack.Push(4)
-	stack.Push(3)
-	stack.Push(2)
-	stack.Push(1)
-
-	for !stack.IsEmpty() {
-		result, err := stack.Pop()
-		fmt.Printf("Result: %v, err: %v \n", result, err)
-	}
-
 	// *********** Dijkstra's algorithm ****************
 	adjMatrix := [][]int{
 		{0, 2, 4, 0, 0, 0},
@@ -66,5 +46,5 @@ func main() {
 		fmt.Printf("route: %s, distance: %v \n", route[i], dist[i])
 	}
 
-	fmt.Printf("\nEnd")
+	fmt.Printf("\nEnd\n")
 }
