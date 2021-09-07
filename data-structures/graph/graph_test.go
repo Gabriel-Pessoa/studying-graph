@@ -12,7 +12,7 @@ type valuePair struct {
 	Vertex, Edge i
 }
 
-func TestAddVertex(t *testing.T) {
+func TestAddVertexGraph(t *testing.T) {
 	errAddVertex := errors.New("fail to add vertex in the graph")
 
 	var tests = []struct {
@@ -52,6 +52,12 @@ func TestAddVertex(t *testing.T) {
 			wantResult: []i{"A", "B", "C", "D"},
 		},
 		{
+			name:       "insert invalid: with nil",
+			vertices:   []i{"A", nil, "C", nil, "D"},
+			wantError:  []error{nil, errAddVertex, nil, errAddVertex, nil},
+			wantResult: []i{"A", "C", "D"},
+		},
+		{
 			name:       "insert with success: vertex as string",
 			vertices:   []i{"A", "B", "C", "D"},
 			wantError:  []error{nil, nil, nil, nil},
@@ -79,19 +85,44 @@ func TestAddVertex(t *testing.T) {
 	}
 }
 
-func TestAddEdge(t *testing.T) {
-	//errAddEdge := errors.New("fail to get the element from dictionary")
+func TestAddVertexFromAddEdgeGraph(t *testing.T) {
+	errAddVertex := errors.New("fail to add vertex in the graph")
 
+	adjacencies := []*valuePair{
+		{Vertex: "A", Edge: "B"},
+		{Vertex: "A", Edge: "C"},
+		{Vertex: "A", Edge: "D"},
+		{Vertex: "C", Edge: "D"},
+		{Vertex: "", Edge: nil},
+		{Vertex: "   ", Edge: ""},
+		{Vertex: nil, Edge: "   "},
+		{Vertex: nil, Edge: "E"},
+		{Vertex: "F", Edge: "   "},
+		{Vertex: nil, Edge: "F"},
+		{Vertex: "E", Edge: nil},
+	}
+	wantError := []error{nil, nil, nil, nil, errAddVertex, errAddVertex, errAddVertex, errAddVertex, errAddVertex, errAddVertex, errAddVertex}
+	wantResult := []i{"A", "B", "C", "D", "F", "E"}
+
+	graphTest := NewGraph(false)
+
+	for i, valuePair := range adjacencies {
+		err := graphTest.AddEdge(valuePair.Vertex, valuePair.Edge)
+		assert.Equal(t, wantError[i], err)
+	}
+
+	assert.Equal(t, wantResult, graphTest.GetVertices())
+}
+
+func TestAddEdgeGraph(t *testing.T) {
 	var tests = []struct {
-		name              string
-		isDirectedGraph   bool
-		adjacencies       []*valuePair
-		wantErrorsAddEdge []error
-		wantErrorsGetAdj  []error
-		wantResult        map[i]*[]dictionary.I
+		name            string
+		isDirectedGraph bool
+		adjacencies     []*valuePair
+		wantResult      map[i]*[]dictionary.I
 	}{
 		{
-			name:            "insert with success: vertex and edge as string",
+			name:            "insert with success: graph is not directed",
 			isDirectedGraph: false,
 			adjacencies: []*valuePair{
 				{Vertex: "A", Edge: "B"},
@@ -99,13 +130,27 @@ func TestAddEdge(t *testing.T) {
 				{Vertex: "A", Edge: "D"},
 				{Vertex: "C", Edge: "D"},
 			},
-			wantErrorsAddEdge: []error{nil, nil, nil, nil},
-			wantErrorsGetAdj:  []error{nil, nil, nil, nil},
 			wantResult: map[i]*[]dictionary.I{
 				"A": {"B", "C", "D"},
 				"B": {"A"},
 				"C": {"A", "D"},
 				"D": {"A", "C"},
+			},
+		},
+		{
+			name:            "insert with success: graph is directed",
+			isDirectedGraph: true,
+			adjacencies: []*valuePair{
+				{Vertex: "A", Edge: "B"},
+				{Vertex: "A", Edge: "C"},
+				{Vertex: "A", Edge: "D"},
+				{Vertex: "C", Edge: "D"},
+			},
+			wantResult: map[i]*[]dictionary.I{
+				"A": {"B", "C", "D"},
+				"B": {},
+				"C": {"D"},
+				"D": {},
 			},
 		},
 	}
@@ -114,10 +159,9 @@ func TestAddEdge(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			graphTest := makeGraphWithVertices(tt.isDirectedGraph)
 
-			for i, valuePair := range tt.adjacencies {
+			for _, valuePair := range tt.adjacencies {
 				err := graphTest.AddEdge(valuePair.Vertex, valuePair.Edge)
-
-				assert.Equal(t, tt.wantErrorsAddEdge[i], err)
+				assert.Equal(t, nil, err)
 			}
 
 			keys := make([]i, 0, len(tt.wantResult))
@@ -125,14 +169,36 @@ func TestAddEdge(t *testing.T) {
 				keys = append(keys, k)
 			}
 
-			for i, k := range keys {
+			for _, k := range keys {
 				adjList, err := graphTest.GetAdjList(k)
-
-				assert.Equal(t, tt.wantErrorsGetAdj[i], err)
+				assert.Equal(t, nil, err)
 				assert.Equal(t, *tt.wantResult[k], adjList)
 			}
 		})
 	}
+}
+
+func TestToStringGraph(t *testing.T) {
+	expectedGraphToString := "A -> B C D \nB -> A E F \nC -> A D G \nD -> A C E G H \nE -> D B I \nF -> B \nG -> C D \nH -> D \nI -> E \n"
+
+	graphTest := NewGraph(false)
+	myVertices := [9]string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
+	for _, v := range myVertices {
+		graphTest.AddVertex(v)
+	}
+	graphTest.AddEdge("A", "B")
+	graphTest.AddEdge("A", "C")
+	graphTest.AddEdge("A", "D")
+	graphTest.AddEdge("C", "D")
+	graphTest.AddEdge("D", "E")
+	graphTest.AddEdge("C", "G")
+	graphTest.AddEdge("D", "G")
+	graphTest.AddEdge("D", "H")
+	graphTest.AddEdge("B", "E")
+	graphTest.AddEdge("B", "F")
+	graphTest.AddEdge("E", "I")
+
+	assert.Equal(t, expectedGraphToString, graphTest.ToString())
 }
 
 func makeGraphWithVertices(isDirected bool) Graph {

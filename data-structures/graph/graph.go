@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Gabriel-Pessoa/studying-graph/data-structures/dictionary"
-	"github.com/Gabriel-Pessoa/studying-graph/utils"
 )
 
 type i interface{}
@@ -33,10 +32,13 @@ func NewGraph(isDirected bool) Graph {
 }
 
 func (g *graph) AddVertex(v i) error {
-	if !g.includes(v) && !utils.IsEmpty(v) {
-		g.Vertices = append(g.Vertices, v)
-		g.AdjList.Set(v, []dictionary.I{})
+	if !g.includes(v) {
+		err := g.AdjList.Set(v, []dictionary.I{})
+		if err != nil {
+			return errors.New("fail to add vertex in the graph")
+		}
 
+		g.Vertices = append(g.Vertices, v)
 		return nil
 	}
 
@@ -45,27 +47,25 @@ func (g *graph) AddVertex(v i) error {
 
 func (g *graph) AddEdge(v, w i) error {
 	if !g.AdjList.HasKey(v) {
-		g.AddVertex(v)
+		err := g.AddVertex(v)
+		if err != nil {
+			return err
+		}
 	}
 
 	if !g.AdjList.HasKey(w) {
-		g.AddVertex(w)
+		err := g.AddVertex(w)
+		if err != nil {
+			return err
+		}
 	}
 
-	adjListV, err := g.AdjList.Get(v)
-	if err != nil {
-		return err
-	}
-
+	adjListV, _ := g.AdjList.Get(v)
 	adjListV = append(adjListV, w)
 	g.AdjList.Set(v, adjListV)
 
 	if !g.IsDirected {
-		adjListW, err := g.AdjList.Get(w)
-		if err != nil {
-			return err
-		}
-
+		adjListW, _ := g.AdjList.Get(w)
 		adjListW = append(adjListW, v)
 		g.AdjList.Set(w, adjListW)
 	}
